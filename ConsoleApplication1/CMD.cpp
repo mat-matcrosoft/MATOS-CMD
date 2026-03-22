@@ -1,6 +1,7 @@
 ﻿#include <iostream>
 #include <string>
 #include <ostream>
+#include "OpenProg.cpp"
 int main() {
 	setlocale(LC_ALL, "RU");
     system("color 0A");
@@ -20,7 +21,7 @@ int main() {
 		std::cin >> comand;
 		std::cout << "Result: " << std::endl;
 		if (comand == "help") {
-			std::cout << "Вы можете использывать команды: help, calculate, print, Shutdown, Reboot" << std::endl;
+			std::cout << "Вы можете использывать команды: help, calculate, print, Shutdown." << std::endl;
 		}
         else if (comand == "calculate") { //Калькулятор!!!
 
@@ -55,6 +56,11 @@ int main() {
             std::cout << "" << std::endl;
             std::cout << printText << std::endl;
         }
+        else if (comand == "OpenProgram") {
+            openProg;
+        }
+       
+        
       
         else {   //Если не определенна!
             system("color 04");
