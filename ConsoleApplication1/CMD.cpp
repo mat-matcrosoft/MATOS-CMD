@@ -8,12 +8,13 @@ int main() {
 	double num1, num2;
     char op;
 	std::string comand, printText;
-	//DOS операции.
+    
+	//Операции
     std::cout << "________________________________________________________\n";
-    std::cout << "|               MATOS-DOS версия 1.0                   |\n";
+    std::cout << "|               MATOS-CMD версия 1.0                   |\n";
     std::cout << "|  (C) Корпорация Matcrosoft, 2024. Все права защищены!|\n";
     std::cout << "|______________________________________________________|\n\n";
-	std::cout << "Welcome to MATOS-DOS! " << std::endl;
+	std::cout << "Welcome to MATOS-CMD! " << std::endl;
 	while(10){
 		std::cout << "Enter your comand >> ";
 		std::cin >> comand;
@@ -59,6 +60,7 @@ int main() {
             std::cout << "" << std::endl;
             std::cout << printText << std::endl;
         }
+      
         else {   //Если не определенна!
             system("color 04");
 			std::cout << comand;
