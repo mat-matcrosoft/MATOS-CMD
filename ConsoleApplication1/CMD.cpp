@@ -49,12 +49,7 @@ int main() {
         }
         else if (comand == "Shutdown") { // Завершение работы окна.
             return 0;
-        }
-        else if (comand == "Reboot") { // Перезагрузка окна.
-            system("start \"\" \"C:\\Документы Матвея\\MatOS-DOS\\LoaderDOS.bat");
-            return 0;
-        }
-        else if (comand == "print") { // Команда print.
+        } else if (comand == "print") { // Команда print.
             std::cout << ">>";
             std::cin >> printText;
             std::cout << "" << std::endl;
