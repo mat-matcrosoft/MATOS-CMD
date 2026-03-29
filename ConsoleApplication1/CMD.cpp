@@ -1,7 +1,8 @@
 ﻿#include <iostream>
 #include <string>
 #include <ostream>
-#include "OpenProg.cpp"
+#include "OpenProg.h"
+#include "CreateFile.h"
 int main() {
 	setlocale(LC_ALL, "RU");
     system("color 0A");
@@ -21,7 +22,7 @@ int main() {
 		std::cin >> comand;
 		std::cout << "Result: " << std::endl;
 		if (comand == "help") {
-			std::cout << "Вы можете использывать команды: help, calculate, print, Shutdown." << std::endl;
+			std::cout << "Вы можете использывать команды: help, calculate, print, Shutdown, OpenProgram, NewFile." << std::endl;
 		}
         else if (comand == "calculate") { //Калькулятор!!!
 
@@ -57,13 +58,13 @@ int main() {
             std::cout << printText << std::endl;
         }
         else if (comand == "OpenProgram") {
-            openProg;
+            openProg();
         }
-       
-        
-      
+        else if (comand == "NewFile") {
+            whatIsName();
+            
+        }
         else {   //Если не определенна!
-            system("color 04");
 			std::cout << comand;
 			std::cout << " is";
 			std::cout << " Unknow comand!" << std::endl;
