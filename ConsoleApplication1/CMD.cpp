@@ -3,27 +3,28 @@
 #include <ostream>
 #include "OpenProg.h"
 #include "CreateFile.h"
+#include "versionCMD.cpp"
 int main() {
-	setlocale(LC_ALL, "RU");
+    setlocale(LC_ALL, "RU");
     system("color 0A");
-	//Переменные и функции.
-	double num1, num2;
+    //Переменные и функции.
+    double num1, num2;
     char op;
-	std::string comand, printText;
+    std::string comand, printText;
     
-	//Операции
+    //Операции
     std::cout << "________________________________________________________\n";
     std::cout << "|               MATOS-CMD версия 1.0                   |\n";
     std::cout << "|  (C) Корпорация Matcrosoft, 2024. Все права защищены!|\n";
     std::cout << "|______________________________________________________|\n\n";
-	std::cout << "Welcome to MATOS-CMD! " << std::endl;
-	while(10){
-		std::cout << "Enter your comand >> ";
-		std::cin >> comand;
-		std::cout << "Result: " << std::endl;
-		if (comand == "help") {
-			std::cout << "Вы можете использывать команды: help, calculate, print, Shutdown, OpenProgram, NewFile." << std::endl;
-		}
+    std::cout << "Welcome to MATOS-CMD! " << std::endl;
+    while(10){
+        std::cout << "Enter your comand >> ";
+        std::cin >> comand;
+        std::cout << "Result: " << std::endl;
+        if (comand == "help") {
+            std::cout << "Вы можете использывать команды: help, calculate, print, Shutdown, OpenProgram, NewFile." << std::endl;
+        }
         else if (comand == "calculate") { //Калькулятор!!!
 
             std::cout << "Введите выражение (например, 5 + 3): ";
@@ -63,13 +64,16 @@ int main() {
         else if (comand == "NewFile") {
             whatIsName();
             
+        } 
+        else if (comand == "version") {
+            version();
         }
         else {   //Если не определенна!
-			std::cout << comand;
-			std::cout << " is";
-			std::cout << " Unknow comand!" << std::endl;
+            std::cout << comand;
+            std::cout << " is";
+            std::cout << " Unknow comand!" << std::endl;
             system("color 0A");
-		}
-	}
-	return 0;
+        }
+    }
+    return 0;
 }
