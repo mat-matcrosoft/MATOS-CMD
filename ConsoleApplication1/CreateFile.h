@@ -1,41 +1,92 @@
+п»ї#pragma once
+
+#include <windows.h>
 #include <iostream>
-#include <fstream>
 #include <string>
 
-// Функция для создания файла и записи содержимого
-void addFile(const std::string& filename, const std::string& extension, const std::string& content) {
-    setlocale(LC_ALL, "RU");
-    // Формируем полное имя файла (имя + . + расширение)
-    std::string fullName = filename + "." + extension;
-
-    // Открываем файл для записи (ofstream автоматически создает файл, если его нет)
-    std::ofstream outFile(fullName);
-
-    // Проверяем, удалось ли создать/открыть файл
-    if (outFile.is_open()) {
-        outFile << content; // Записываем контент
-        outFile.close();    // Закрываем файл
-        std::cout << "Файл '" << fullName << "' успешно создан и изменен." << std::endl;
+namespace matcmd {
+inline std::string wideToUtf8(const std::wstring& value) {
+    if (value.empty()) {
+        return {};
     }
-    else {
-        std::cerr << "Ошибка: не удалось создать файл '" << fullName << "'." << std::endl;
+
+    const int required = WideCharToMultiByte(
+        CP_UTF8, WC_ERR_INVALID_CHARS, value.data(), static_cast<int>(value.size()),
+        nullptr, 0, nullptr, nullptr);
+    if (required <= 0) {
+        return {};
     }
+
+    std::string result(static_cast<size_t>(required), '\0');
+    if (WideCharToMultiByte(
+            CP_UTF8, WC_ERR_INVALID_CHARS, value.data(), static_cast<int>(value.size()),
+            result.data(), required, nullptr, nullptr) <= 0) {
+        return {};
+    }
+    return result;
+}
 }
 
-int whatIsName() {
-    std::string name, ext, text;
-    setlocale(LC_ALL, "RU");
-    // Запрос данных у пользователя
-    std::cout << "Введите имя файла: ";
-    std::cin >> name;
-    std::cout << "Введите расширение файла (например, txt БЕЗ ТОЧКИ!): ";
-    std::cin >> ext;
-    std::cin.ignore(); // Очистка буфера после cin
-    std::cout << "Введите содержимое файла: ";
-    std::getline(std::cin, text); // Считываем строку с пробелами
+inline bool addFile(const std::wstring& filename, const std::wstring& extension, const std::wstring& content) {
+    std::wstring fullName = filename;
+    if (!extension.empty()) {
+        if (extension.front() != L'.') {
+            fullName += L'.';
+        }
+        fullName += extension;
+    }
 
-    // Вызов функции
-    addFile(name, ext, text);
+    const std::string utf8Content = matcmd::wideToUtf8(content);
+    if (!content.empty() && utf8Content.empty()) {
+        std::wcerr << L"РћС€РёР±РєР°: С‚РµРєСЃС‚ СЃРѕРґРµСЂР¶РёС‚ РЅРµРґРѕРїСѓСЃС‚РёРјСѓСЋ РїРѕСЃР»РµРґРѕРІР°С‚РµР»СЊРЅРѕСЃС‚СЊ Unicode.\n";
+        return false;
+    }
 
-    return 0;
+    HANDLE file = CreateFileW(
+        fullName.c_str(), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS,
+        FILE_ATTRIBUTE_NORMAL, nullptr);
+    if (file == INVALID_HANDLE_VALUE) {
+        std::wcerr << L"РћС€РёР±РєР°: РЅРµ СѓРґР°Р»РѕСЃСЊ СЃРѕР·РґР°С‚СЊ С„Р°Р№Р» '" << fullName
+                   << L"'. РљРѕРґ Windows: " << GetLastError() << L"\n";
+        return false;
+    }
+
+    DWORD written = 0;
+    const bool writtenSuccessfully = utf8Content.empty() ||
+        (utf8Content.size() <= MAXDWORD &&
+         WriteFile(file, utf8Content.data(), static_cast<DWORD>(utf8Content.size()), &written, nullptr) &&
+         written == utf8Content.size());
+    CloseHandle(file);
+
+    if (!writtenSuccessfully) {
+        std::wcerr << L"РћС€РёР±РєР°: РЅРµ СѓРґР°Р»РѕСЃСЊ Р·Р°РїРёСЃР°С‚СЊ С„Р°Р№Р» '" << fullName << L"'.\n";
+        return false;
+    }
+
+    std::wcout << L"Р¤Р°Р№Р» '" << fullName << L"' СѓСЃРїРµС€РЅРѕ СЃРѕР·РґР°РЅ РІ UTF-8.\n";
+    return true;
+}
+
+inline int whatIsName() {
+    std::wstring name;
+    std::wstring extension;
+    std::wstring content;
+
+    std::wcout << L"Р’РІРµРґРёС‚Рµ РёРјСЏ С„Р°Р№Р»Р°: ";
+    if (!std::getline(std::wcin, name) || name.empty()) {
+        std::wcerr << L"РћС€РёР±РєР°: РёРјСЏ С„Р°Р№Р»Р° РЅРµ РјРѕР¶РµС‚ Р±С‹С‚СЊ РїСѓСЃС‚С‹Рј.\n";
+        return 1;
+    }
+
+    std::wcout << L"Р’РІРµРґРёС‚Рµ СЂР°СЃС€РёСЂРµРЅРёРµ С„Р°Р№Р»Р° (РЅР°РїСЂРёРјРµСЂ, txt, Р±РµР· С‚РѕС‡РєРё): ";
+    if (!std::getline(std::wcin, extension)) {
+        return 1;
+    }
+
+    std::wcout << L"Р’РІРµРґРёС‚Рµ СЃРѕРґРµСЂР¶РёРјРѕРµ С„Р°Р№Р»Р°: ";
+    if (!std::getline(std::wcin, content)) {
+        return 1;
+    }
+
+    return addFile(name, extension, content) ? 0 : 1;
 }

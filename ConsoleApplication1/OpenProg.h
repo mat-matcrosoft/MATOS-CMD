@@ -1,12 +1,47 @@
+п»ї#pragma once
+
+#include <windows.h>
+#include <shellapi.h>
 #include <iostream>
 #include <string>
-#include <cstdlib> // Для функции system()
-void openProg() {
-	// Команда для запуск системной программы
-	std::string progName;
-	std::cout << "Введите имя программы/файла для запуска: ";
-	std::cin >> progName;
 
-	// Запуск программы
-	system(progName.c_str());
+#pragma comment(lib, "Shell32.lib")
+
+inline std::wstring trimProgramName(std::wstring value) {
+    const auto first = value.find_first_not_of(L" \t");
+    if (first == std::wstring::npos) {
+        return L"";
+    }
+    const auto last = value.find_last_not_of(L" \t");
+    value = value.substr(first, last - first + 1);
+    if (value.size() >= 2 && value.front() == L'"' && value.back() == L'"') {
+        value = value.substr(1, value.size() - 2);
+    }
+    return value;
+}
+
+inline void openProg(const std::wstring& requestedName = L"") {
+    std::wstring programName = trimProgramName(requestedName);
+    if (programName.empty()) {
+        std::wcout << L"Р’РІРµРґРёС‚Рµ РїСѓС‚СЊ Рє РїСЂРѕРіСЂР°РјРјРµ РёР»Рё С„Р°Р№Р»Сѓ: ";
+        if (!std::getline(std::wcin, programName)) {
+            return;
+        }
+        programName = trimProgramName(programName);
+    }
+
+    if (programName.empty()) {
+        std::wcerr << L"РћС€РёР±РєР°: РїСѓС‚СЊ РЅРµ РјРѕР¶РµС‚ Р±С‹С‚СЊ РїСѓСЃС‚С‹Рј.\n";
+        return;
+    }
+
+    const HINSTANCE result = ShellExecuteW(
+        nullptr, L"open", programName.c_str(), nullptr, nullptr, SW_SHOWNORMAL);
+    if (reinterpret_cast<INT_PTR>(result) <= 32) {
+        std::wcerr << L"РћС€РёР±РєР°: РЅРµ СѓРґР°Р»РѕСЃСЊ РѕС‚РєСЂС‹С‚СЊ '" << programName
+                   << L"'. РљРѕРґ Windows: " << reinterpret_cast<INT_PTR>(result) << L"\n";
+        return;
+    }
+
+    std::wcout << L"РћС‚РєСЂС‹С‚Рѕ: " << programName << L"\n";
 }
